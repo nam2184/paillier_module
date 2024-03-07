@@ -5,9 +5,10 @@ class PublicKeySmall {
 private:
     const unsigned int n;
     const unsigned int g;
+    const unsigned int r;
 
 public:
-    PublicKeySmall(const unsigned int n, const unsigned int g);
+    PublicKeySmall(const unsigned int n, const unsigned int g, const unsigned int r);
 
     // encryption function
     unsigned int encrypt(const unsigned int value);

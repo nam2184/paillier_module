@@ -3,17 +3,22 @@
 #include "paillier.hpp"
 int DEFAULT_KEY_SIZE = 16;
 
-PublicKeySmall::PublicKeySmall(const unsigned int n, const unsigned int g) : n(n), g(g){}
+PublicKeySmall::PublicKeySmall(const unsigned int n, const unsigned int g, const unsigned int r) : n(n), g(g), r(r){}
 PrivateKeySmall::PrivateKeySmall(const unsigned int n, const unsigned int lambda, const unsigned int gMu) : n(n), lambda(lambda), gMu(gMu) {}
 
 unsigned int PublicKeySmall::encrypt(const unsigned int value)
 {
-  return 0;
+  unsigned int nsquared = n*n;                      
+  unsigned int k1 = math::powermod(g, value, nsquared);
+  unsigned int k2 = math::powermod(r, n, nsquared);
+
+  return (k1 * k2) % (nsquared);
 }
 
 unsigned int PrivateKeySmall::decrypt(const unsigned int cipher)
 {
-  return 0;
+    unsigned int l = (math::powermod(cipher, lambda, n*n) - 1) / n;
+    return (l* gMu) % n;
 }
 
 
@@ -32,7 +37,7 @@ unsigned int PaillierKeyGenSmall::generate_prime(unsigned int N){
     std::random_device rd;
     std::default_random_engine generator(rd());
     //MIN VALUE ON LEFT AND MAX VALUE ON RIGHT
-    std::uniform_int_distribution<int> distribution(1 << (N-1), (1 << N) - 1);
+    std::uniform_int_distribution<unsigned int> distribution(1 << (N-1), (1 << N) - 1);
 
     // generate a random number and make sure it's odd
     int random_number = distribution(generator) | 1;
@@ -46,7 +51,7 @@ unsigned int PaillierKeyGenSmall::generate_g(unsigned int N, unsigned int n)
 {
       std::random_device rd;
       std::mt19937 gen(rd());
-      std::uniform_int_distribution<int> distribution(1 << (n-1), n * n - 1);
+      std::uniform_int_distribution<unsigned int> distribution(1 << (n-1), n * n - 1);
       
       unsigned int g_value = distribution(gen); 
       while (math::euler_totient(std::pow(n,2), g_value)) 
@@ -61,7 +66,7 @@ void PaillierKeyGenSmall::key_att(unsigned int n_length, unsigned int& n, unsign
 {
     unsigned int p_value = PaillierKeyGenSmall::generate_prime(n_length/2);
     unsigned int q_value = p_value;
-    while ((p_value != q_value) && (std::gcd(p_value*q_value,(p_value-1)*(q_value-1)) == 1)) {
+    while ((p_value == q_value) && (std::gcd(p_value*q_value,(p_value-1)*(q_value-1)) == 1)) {
       q_value = PaillierKeyGenSmall::generate_prime(n_length/2);
     }
 
@@ -70,17 +75,20 @@ void PaillierKeyGenSmall::key_att(unsigned int n_length, unsigned int& n, unsign
     lambda = std::lcm(p_value-1, q_value-1);
     
     //chance of overflow so reccomended only 1-20 bit integers to prevent overflows
-    auto l = (math::powermod(g, lambda, n*n) - 1) / n;
+    unsigned int l = (math::powermod(g, lambda, n*n) - 1) / n;
     gMu = math::modInverse(l, n);
     if (gMu == 0)
     {
       throw std::invalid_argument("gMu is 0");
-    }
-  
+    }  
 }
 
 PublicKeySmall PaillierKeyGenSmall::generatePublicKey() {
-  return PublicKeySmall(n, g); 
+   std::random_device rd;
+   std::default_random_engine generator(rd());
+   std::uniform_int_distribution<unsigned int> distribution(0, n);
+  
+   return PublicKeySmall(n, g, distribution(generator)); 
 }
 
 PrivateKeySmall PaillierKeyGenSmall::generatePrivateKey() {

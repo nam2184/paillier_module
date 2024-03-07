@@ -1,0 +1,2 @@
+/usr/bin/ar qc libpaillier_small.a CMakeFiles/paillier_small.dir/paillier_small.cpp.o
+/usr/bin/ranlib libpaillier_small.a

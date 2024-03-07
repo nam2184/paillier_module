@@ -30,7 +30,7 @@ bool math::euler_btotient(BIGNUM *n, BIGNUM *g, BN_CTX *ctx)
   return BN_cmp(gcd_result, one) == 1;
 }
 
-unsigned int powermod(unsigned int x, unsigned int y, unsigned int p) 
+unsigned int math::powermod(unsigned int x, unsigned int y, unsigned int p) 
 { 
     unsigned int res = 1;     // Initialize result 
  

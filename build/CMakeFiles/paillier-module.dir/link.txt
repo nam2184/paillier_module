@@ -1,0 +1,1 @@
+/usr/bin/c++ "CMakeFiles/paillier-module.dir/main.cpp.o" -o paillier-module  src/libpaillier_small.a 
