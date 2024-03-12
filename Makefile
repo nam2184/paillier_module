@@ -1,5 +1,5 @@
-CXX = g++
-CXXFLAGS = -std=c++11 -Wall -Wextra -pedantic
+CXX = gcc -fPIC
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic 
 
 # Directories
 SRC_DIR = src
@@ -11,9 +11,8 @@ PAILLIER_OBJ = $(SRC_DIR)/paillier_small.o
 MAIN_OBJ = main.o
 
 # Libraries
-MATH_LIB = math.so
-PAILLIER_LIB = paillier_small.so
-
+MATH_LIB = $(DETAIL_DIR)/math.so
+PAILLIER_LIB = $(SRC_DIR)/paillier_small.so
 # Executable
 EXECUTABLE = main
 
@@ -21,9 +20,9 @@ EXECUTABLE = main
 all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(MAIN_OBJ) $(PAILLIER_LIB) $(MATH_LIB)
-	$(CXX) $(CXXFLAGS) -o $@ $< -L. -lssl -lcrypto -lstdc++ -Wl,-rpath,'$$ORIGIN' -lpaillier_small -lmath
+	$(CXX) $(CXXFLAGS) -o $@ $< -L. ./src/paillier_small.so ./detail/math.so -fPIC -lstdc++ -Wl,-rpath
 
-$(MAIN_OBJ): $(SRC_DIR)/main.cpp
+$(MAIN_OBJ): ./main.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(PAILLIER_LIB): $(PAILLIER_OBJ)
@@ -33,10 +32,10 @@ $(MATH_LIB): $(MATH_OBJ)
 	$(CXX) $(CXXFLAGS) -shared -o $@ $< -lssl -lcrypto
 
 $(PAILLIER_OBJ): $(SRC_DIR)/paillier_small.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) -fPIC -c $(CXXFLAGS)  $< -o $@ 
 
 $(MATH_OBJ): $(DETAIL_DIR)/math.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@ -lssl -lcrypto
+	$(CXX) $(CXXFLAGS) -c  $< -o $@ -lssl -lcrypto
 
 clean:
 	rm -f $(EXECUTABLE) $(MAIN_OBJ) $(PAILLIER_LIB) $(PAILLIER_OBJ) $(MATH_LIB) $(MATH_OBJ)

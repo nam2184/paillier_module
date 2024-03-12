@@ -6,7 +6,7 @@
 #include <iostream>
 
 namespace math {
-    bool is_prime(int x);
+    bool is_prime(unsigned int x);
     bool euler_totient(int n, int g);
     bool euler_btotient(BIGNUM *n, BIGNUM *g, BN_CTX *ctx);
     unsigned int powermod(unsigned int x, unsigned int y, unsigned int p);

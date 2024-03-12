@@ -1,7 +1,8 @@
 #include "math.hpp"
 #include "openssl/bn.h"
+#include <iostream>
 
-bool math::is_prime(int x)
+bool math::is_prime(unsigned int x)
 {
       if(x <= 1) return false;
       if(x == 2 || x == 3) return true;
@@ -11,6 +12,7 @@ bool math::is_prime(int x)
       {
         if(x % i == 0 || x % (i + 2) == 0) return false;
       }
+      std::cout<<"Prime is : " << x << std::endl;
     return true;
 }
 

@@ -1,0 +1,12 @@
+# Ignore main executable
+main
+
+# Ignore compiled object files
+*.o
+
+# Ignore shared libraries
+paillier_small.so
+math.so
+src/paillier_small.so
+detail/math.so
+
