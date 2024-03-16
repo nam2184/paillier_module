@@ -12,6 +12,11 @@ public:
 
     // encryption function
     unsigned int encrypt(const unsigned int value);
+
+    unsigned int cipher_add(unsigned int a, unsigned int b);
+      
+    unsigned int cipher_cmul(unsigned int a, unsigned int b);
+
 };
 #endif
 

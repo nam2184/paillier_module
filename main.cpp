@@ -4,14 +4,19 @@
 #include <openssl/crypto.h>
 #include <openssl/ssl.h>
 
-int main(int argc, char* argv[]) {
+int main() {
    PaillierKeyGenSmall keygen;
    PublicKeySmall publickey = keygen.generatePublicKey();
    PrivateKeySmall privatekey = keygen.generatePrivateKey();
-   std::cout << publickey.encrypt(2) + publickey.encrypt(4) << std::endl;
-  
-   std::cout << privatekey.decrypt(publickey.encrypt(2) + publickey.encrypt(4)) << std::endl;
-     
+   auto a = publickey.encrypt(17);
+   auto b = publickey.encrypt(18);
+   unsigned int c = publickey.cipher_add(a, b);
+   std::cout << "CIphertext a: "  << a << std::endl;
+   std::cout << "CIphertext b: "  << b << std::endl;
+   std::cout << "Ciphertotal : "  << c << std::endl;
+   auto res = privatekey.decrypt(c); 
+   std::cout <<"Decrypted key : " << res << std::endl;
+    
    return 0;
 }
 

@@ -5,7 +5,8 @@
 #include <openssl/bn.h>
 #include <iostream>
 
-namespace math {
+namespace math 
+{
     bool is_prime(unsigned int x);
     bool euler_totient(int n, int g);
     bool euler_btotient(BIGNUM *n, BIGNUM *g, BN_CTX *ctx);
@@ -13,5 +14,6 @@ namespace math {
     int gcdExtended(unsigned int a, unsigned int b, int* x, int* y);
     unsigned int modInverse(int A, int M);
 }
-
 #endif
+
+

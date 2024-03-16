@@ -11,10 +11,7 @@ PrivateKey::PrivateKey(BIGNUM *n, BIGNUM *lambda, BIGNUM *gMu) : n(n), lambda(la
 //Key gen constructor
 PaillierKeyGen::PaillierKeyGen() 
 {
-      n = BN_new();
-      g = BN_new();
-      lambda = BN_new(); 
-      gMu = BN_new(); 
+      PaillierKeyGen::key_batt(n,g,lambda,gMu,DEFAULT_KEY_SIZE);
 }
  
 //Key Gen destructor
@@ -27,8 +24,8 @@ PaillierKeyGen::~PaillierKeyGen()
 }
 
 PublicKey PaillierKeyGen::generatePublicKey()
-{
-  PaillierKeyGen::key_batt(n,g,lambda,gMu,DEFAULT_KEY_SIZE);
+{ 
+  //add r
   return PublicKey(n,g);
 }
 
@@ -64,6 +61,20 @@ void PaillierKeyGen::key_batt(BIGNUM *n, BIGNUM *g, BIGNUM *lambda, BIGNUM *gMu,
     BIGNUM *one = BN_new();
     BN_CTX *ctx = BN_CTX_new();
 
+    if (!p || !pq1 || !ps1 || !qs1 || !q || !gcd || !one || !ctx) 
+    {
+        // Handle memory allocation failure
+        // For example, free already allocated memory and return
+        BN_free(p);
+        BN_free(pq1);
+        BN_free(ps1);
+        BN_free(qs1);
+        BN_free(q);
+        BN_free(gcd);
+        BN_free(one);
+        BN_CTX_free(ctx);
+        return;
+    }
 
     BN_set_word(one, 1);
 
@@ -75,7 +86,7 @@ void PaillierKeyGen::key_batt(BIGNUM *n, BIGNUM *g, BIGNUM *lambda, BIGNUM *gMu,
     BN_mul(pq1, ps1, qs1, ctx);
     BN_gcd(gcd, n, pq1, ctx);
 
-    while ((BN_cmp(p,q) == 0) && (BN_cmp(gcd, one) == 0)) {
+    while ((BN_cmp(p,q) != 0) && (BN_cmp(gcd, one) != 0)) {
       PaillierKeyGen::generate_bprime(n_length/2,q, ctx);
       BN_mul(n, p, q, ctx); 
       BN_sub(qs1, q, one);

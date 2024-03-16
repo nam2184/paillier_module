@@ -32,27 +32,18 @@ bool math::euler_btotient(BIGNUM *n, BIGNUM *g, BN_CTX *ctx)
   return BN_cmp(gcd_result, one) == 1;
 }
 
-unsigned int math::powermod(unsigned int x, unsigned int y, unsigned int p) 
-{ 
-    unsigned int res = 1;     // Initialize result 
- 
-    x = x % p; // Update x if it is more than or 
-                // equal to p
-  
-    if (x == 0) return 0; // In case x is divisible by p;
- 
-    while (y > 0) 
-    { 
-        // If y is odd, multiply x with result 
-        if (y & 1) 
-            res = (res*x) % p; 
- 
-        // y must be even now 
-        y = y>>1; // y = y/2 
-        x = (x*x) % p; 
-    } 
-    return res; 
-}
+unsigned int math::powermod(unsigned int a, unsigned int b, unsigned int p) 
+{   
+    unsigned long number = 1;
+    while (b)
+    {
+        if (b & 1)
+            number = number * a % p;
+        b >>= 1;
+        a = (unsigned long)a * a % p;
+    }
+    return number; 
+} 
 
 // Function for extended Euclidean Algorithm
 int math::gcdExtended(unsigned int a, unsigned int b, int* x, int* y)
@@ -90,7 +81,9 @@ unsigned int math::modInverse(int A, int M)
         return res; 
     }
     return 0;
-} 
+}
+
+
 
 
 
