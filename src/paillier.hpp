@@ -2,16 +2,27 @@
 #define PUBLIC_KEY_H
 
 #include <openssl/bn.h>
+#include <openssl/types.h>
 class PublicKey {
 private:
-    BIGNUM *n;
-    BIGNUM *g;
+    const BIGNUM *n;
+    const BIGNUM *g;
+    BIGNUM *br;
+    BN_CTX *ctx;
+    BN_MONT_CTX *mont_ctx;
 
 public:
-    PublicKey(BIGNUM *n, BIGNUM *g);
+    BIGNUM *nsquared;
 
+public:
+    PublicKey(const BIGNUM *n, const BIGNUM *g, const int r);
+    ~PublicKey();
     // encryption function
-    int encrypt(int value);
+    void encrypt(BIGNUM* value, BIGNUM *cipher);
+
+    void add_cip(BIGNUM *result, BIGNUM* cipher1, BIGNUM* cipher2);
+    
+    void mul_cons(BIGNUM *result, BIGNUM* cipher, BIGNUM* cons);
 };
 #endif
 
@@ -20,16 +31,22 @@ public:
 
 class PrivateKey {
 private:
-    BIGNUM *n;
-    BIGNUM *lambda;
-    BIGNUM *gMu;
+    const BIGNUM *n;
+    const BIGNUM *lambda;
+    const BIGNUM *gMu;
+    BIGNUM *one;
+    BN_CTX *ctx;
+    PublicKey publickey;
 
 public:
-    PrivateKey(BIGNUM *n, BIGNUM *lambda, BIGNUM *gMu);
-    
+    BIGNUM *nsquared;
 
-    // encryption function
-    int decrypt(int cipher);
+public:
+    PrivateKey(const BIGNUM *n, const BIGNUM *lambda, const BIGNUM *gMu, const PublicKey& publickey);
+    ~PrivateKey();
+
+    //dencryption function
+    void decrypt(BIGNUM *cipher, BIGNUM *plaintext);
 };
 #endif
 
@@ -53,7 +70,7 @@ public:
     PublicKey generatePublicKey();
 
     // Private key generation function
-    PrivateKey generatePrivateKey();
+    PrivateKey generatePrivateKey(PublicKey& publickey);
     
     void generate_bprime(unsigned int N, BIGNUM *num, BN_CTX *ctx);
         
